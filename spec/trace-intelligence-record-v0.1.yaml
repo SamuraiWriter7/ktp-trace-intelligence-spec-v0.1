@@ -1,0 +1,558 @@
+id: ktp-trace-intelligence-record-v0.1
+version: 0.1.0
+title: KTP Trace Intelligence Record
+status: draft
+
+description: >
+  A minimal specification for recording origin candidates,
+  structural influence, conceptual similarity, and trace intelligence
+  claims within the Kazene Trace Protocol.
+
+  This record is designed as an evidence packet.
+  It does not determine final authorship, ownership, legal liability,
+  or automatic royalty allocation.
+
+core_principle: >
+  Origin candidates are not final origins.
+
+purpose:
+  - Record trace intelligence claims in a machine-readable format.
+  - Identify possible origin candidates without final judgment.
+  - Preserve semantic, structural, conceptual, and provenance-related evidence.
+  - Separate evidence from enforcement, judgment, and allocation.
+  - Support later human, institutional, or multi-wing review.
+  - Prevent premature royalty allocation based only on similarity scores.
+
+non_goals:
+  - Determine legal authorship.
+  - Prove copyright ownership.
+  - Assign final origin status.
+  - Automatically calculate royalty shares.
+  - Enforce payments.
+  - Replace human judgment.
+  - Replace dispute handling or governance processes.
+
+design_principles:
+  - candidate_not_verdict
+  - evidence_before_enforcement
+  - inference_not_judgment
+  - human_or_multi_wing_review_required
+  - no_direct_allocation
+  - dispute_is_expected
+  - provenance_and_structure_are_separate
+  - transparency_over_certainty
+
+record_type:
+  name: Trace Intelligence Record
+  role: observation_layer
+  description: >
+    A Trace Intelligence Record acts as the observation layer of
+    the Kazene Trace Protocol. It records possible origin candidates
+    and supporting evidence, but does not make final judgments or
+    trigger automatic allocation.
+
+lifecycle:
+  - created
+  - evidence_recorded
+  - pending_review
+  - reviewed
+  - disputed
+  - revised
+  - rejected
+  - accepted_as_candidate
+  - passed_to_allocation_readiness
+
+record_fields:
+  trace_id:
+    type: string
+    required: true
+    description: >
+      A unique identifier for this trace intelligence record.
+    example: ktp-trace-2026-0001
+
+  record_version:
+    type: string
+    required: true
+    description: >
+      Version of the Trace Intelligence Record format.
+    example: "0.1.0"
+
+  created_at:
+    type: datetime
+    required: true
+    description: >
+      Timestamp when the trace record was created.
+    example: "2026-05-18T10:00:00Z"
+
+  updated_at:
+    type: datetime
+    required: false
+    description: >
+      Timestamp when the trace record was last updated.
+    example: "2026-05-18T12:00:00Z"
+
+  observer:
+    type: object
+    required: true
+    description: >
+      The entity that created or submitted the trace intelligence record.
+    fields:
+      type:
+        type: enum
+        required: true
+        values:
+          - human
+          - ai_agent
+          - platform
+          - institution
+          - hybrid
+        description: >
+          Type of observer.
+      name:
+        type: string
+        required: true
+        description: >
+          Name or identifier of the observer.
+      identifier:
+        type: string
+        required: false
+        description: >
+          Optional URI, DID, account ID, agent ID, or institutional identifier.
+      confidence_policy:
+        type: string
+        required: false
+        description: >
+          Optional statement describing how the observer estimates confidence.
+
+  target:
+    type: object
+    required: true
+    description: >
+      The content, concept, structure, prompt, or output being examined.
+    fields:
+      type:
+        type: enum
+        required: true
+        values:
+          - text
+          - article
+          - prompt
+          - concept
+          - structure
+          - model_output
+          - image
+          - audio
+          - video
+          - code
+          - dataset
+          - other
+        description: >
+          Type of target being examined.
+      title:
+        type: string
+        required: false
+        description: >
+          Human-readable title of the target.
+      uri:
+        type: string
+        required: false
+        description: >
+          URI or location of the target, if available.
+      content_hash:
+        type: string
+        required: false
+        description: >
+          Hash of the target content, if available.
+        example: sha256:examplehash
+      captured_at:
+        type: datetime
+        required: false
+        description: >
+          Timestamp when the target was observed or captured.
+      language:
+        type: string
+        required: false
+        description: >
+          Language of the target content, if applicable.
+        example: en
+      summary:
+        type: string
+        required: false
+        description: >
+          Short summary of the target.
+
+  origin_candidates:
+    type: array
+    required: true
+    description: >
+      Possible origin candidates related to the target.
+      These are not final origins.
+    item_fields:
+      origin_id:
+        type: string
+        required: true
+        description: >
+          Identifier for the possible origin candidate.
+      title:
+        type: string
+        required: false
+        description: >
+          Human-readable title of the origin candidate.
+      uri:
+        type: string
+        required: false
+        description: >
+          URI or location of the origin candidate, if available.
+      content_hash:
+        type: string
+        required: false
+        description: >
+          Hash of the origin candidate content, if available.
+      relation_type:
+        type: enum
+        required: true
+        values:
+          - direct_reference
+          - explicit_citation
+          - structural_similarity
+          - conceptual_influence
+          - semantic_similarity
+          - implicit_absorption
+          - derivative_adaptation
+          - paraphrase
+          - translation
+          - blended_influence
+          - unknown
+        description: >
+          Type of relationship inferred between the target and origin candidate.
+      confidence:
+        type: number
+        required: true
+        minimum: 0.0
+        maximum: 1.0
+        description: >
+          Confidence score for this origin candidate relation.
+          This score is evidence only and must not be treated as final judgment.
+      evidence_summary:
+        type: string
+        required: true
+        description: >
+          Short explanation of the supporting evidence.
+      limitations:
+        type: string
+        required: false
+        description: >
+          Known limitations, uncertainties, or reasons this candidate may be incorrect.
+
+  evidence:
+    type: object
+    required: true
+    description: >
+      Evidence supporting the trace intelligence claim.
+      Evidence is separated from judgment.
+    fields:
+      semantic_similarity_score:
+        type: number
+        required: false
+        minimum: 0.0
+        maximum: 1.0
+        description: >
+          Semantic similarity score between target and origin candidate.
+      structure_similarity_score:
+        type: number
+        required: false
+        minimum: 0.0
+        maximum: 1.0
+        description: >
+          Structural similarity score between target and origin candidate.
+      conceptual_similarity_score:
+        type: number
+        required: false
+        minimum: 0.0
+        maximum: 1.0
+        description: >
+          Conceptual similarity score between target and origin candidate.
+      citation_presence:
+        type: boolean
+        required: false
+        description: >
+          Whether explicit citation or reference is present.
+      metadata_presence:
+        type: boolean
+        required: false
+        description: >
+          Whether provenance metadata is present.
+      watermark_presence:
+        type: boolean
+        required: false
+        description: >
+          Whether watermark evidence is present.
+      chain_of_custody_presence:
+        type: boolean
+        required: false
+        description: >
+          Whether chain-of-custody evidence is present.
+      structure_fingerprint_presence:
+        type: boolean
+        required: false
+        description: >
+          Whether a structure fingerprint record is available.
+      origin_token_presence:
+        type: boolean
+        required: false
+        description: >
+          Whether an explicit Origin Token is available.
+      evidence_items:
+        type: array
+        required: false
+        description: >
+          Optional list of individual evidence items.
+        item_fields:
+          evidence_id:
+            type: string
+            required: true
+          evidence_type:
+            type: enum
+            required: true
+            values:
+              - citation
+              - metadata
+              - watermark
+              - content_hash
+              - structure_fingerprint
+              - semantic_match
+              - chain_of_custody
+              - human_observation
+              - ai_analysis
+              - platform_log
+              - other
+          description:
+            type: string
+            required: true
+          uri:
+            type: string
+            required: false
+          confidence:
+            type: number
+            required: false
+            minimum: 0.0
+            maximum: 1.0
+
+  analysis:
+    type: object
+    required: false
+    description: >
+      Optional analysis explaining the trace reasoning process.
+    fields:
+      method:
+        type: enum
+        required: false
+        values:
+          - manual_review
+          - embedding_similarity
+          - structure_fingerprint_comparison
+          - llm_assisted_analysis
+          - provenance_analysis
+          - hybrid_analysis
+          - other
+      summary:
+        type: string
+        required: false
+      reasoning_notes:
+        type: string
+        required: false
+      uncertainty_notes:
+        type: string
+        required: false
+
+  review_status:
+    type: object
+    required: true
+    description: >
+      Current review state of the trace intelligence record.
+    fields:
+      state:
+        type: enum
+        required: true
+        values:
+          - pending
+          - under_review
+          - reviewed
+          - disputed
+          - rejected
+          - revised
+          - accepted_as_candidate
+        description: >
+          Current state of the record.
+      reviewer:
+        type: string
+        required: false
+        description: >
+          Human, institution, AI agent, or multi-wing process that reviewed the record.
+      reviewed_at:
+        type: datetime
+        required: false
+        description: >
+          Timestamp of review.
+      notes:
+        type: string
+        required: false
+        description: >
+          Review notes.
+
+  dispute_status:
+    type: object
+    required: false
+    description: >
+      Optional dispute information for challenged trace records.
+    fields:
+      disputed:
+        type: boolean
+        required: true
+      dispute_id:
+        type: string
+        required: false
+      reason:
+        type: string
+        required: false
+      status:
+        type: enum
+        required: false
+        values:
+          - none
+          - opened
+          - under_review
+          - resolved
+          - dismissed
+          - escalated
+
+  allocation_readiness:
+    type: object
+    required: true
+    description: >
+      Indicates whether the trace record is ready to be considered
+      by a separate allocation readiness process.
+    fields:
+      ready:
+        type: boolean
+        required: true
+        description: >
+          Whether this record is ready for allocation review.
+          This must not mean automatic allocation.
+      reason:
+        type: string
+        required: true
+        description: >
+          Explanation for the readiness state.
+      required_next_step:
+        type: enum
+        required: false
+        values:
+          - human_review
+          - multi_wing_review
+          - dispute_resolution
+          - additional_evidence
+          - allocation_readiness_review
+          - no_action
+        description: >
+          Recommended next step before allocation can be considered.
+
+  governance:
+    type: object
+    required: false
+    description: >
+      Optional governance context.
+    fields:
+      policy_reference:
+        type: string
+        required: false
+      jurisdiction:
+        type: string
+        required: false
+      review_body:
+        type: string
+        required: false
+      notes:
+        type: string
+        required: false
+
+validation_rules:
+  - trace_id must be present.
+  - record_version must be present.
+  - created_at must be present.
+  - observer.type must be one of the allowed observer types.
+  - target.type must be one of the allowed target types.
+  - origin_candidates must contain at least one candidate.
+  - each origin candidate must include relation_type and confidence.
+  - confidence values must be between 0.0 and 1.0.
+  - review_status.state must be present.
+  - allocation_readiness.ready must be present.
+  - allocation_readiness.ready must not imply automatic royalty allocation.
+  - no trace record may claim final legal authorship.
+  - no trace record may directly trigger payment or enforcement.
+
+safety_notes:
+  - A Trace Intelligence Record is evidence, not a verdict.
+  - Similarity does not prove origin.
+  - Structural resemblance does not prove copying.
+  - Implicit absorption must be treated as uncertain.
+  - Allocation requires a separate readiness and review process.
+  - Dispute handling should be expected and supported.
+
+example_minimal_record:
+  trace_id: ktp-trace-2026-0001
+  record_version: "0.1.0"
+  created_at: "2026-05-18T10:00:00Z"
+  observer:
+    type: ai_agent
+    name: Shingen-Tracking-Maru
+  target:
+    type: article
+    title: The Future of Trace Intelligence
+    uri: https://example.com/article
+    content_hash: sha256:examplehash
+  origin_candidates:
+    - origin_id: kazene-origin-001
+      title: Kazene Trace Protocol
+      uri: https://example.com/origin
+      relation_type: structural_similarity
+      confidence: 0.78
+      evidence_summary: >
+        The target shares a similar layered structure:
+        origin, trace, review, and allocation.
+  evidence:
+    semantic_similarity_score: 0.72
+    structure_similarity_score: 0.81
+    conceptual_similarity_score: 0.76
+    citation_presence: false
+    metadata_presence: false
+    watermark_presence: false
+    chain_of_custody_presence: false
+    structure_fingerprint_presence: false
+    origin_token_presence: false
+  review_status:
+    state: pending
+    reviewer: ""
+    notes: Requires human or multi-wing review.
+  allocation_readiness:
+    ready: false
+    reason: >
+      Trace record is evidence only.
+      Allocation requires separate review.
+    required_next_step: multi_wing_review
+
+related_components:
+  - Kazene Trace Protocol
+  - Structure Fingerprint
+  - Origin Token
+  - C2PA-inspired Provenance
+  - Chain of Custody
+  - Dispute Registry
+  - Allocation Readiness
+  - Royalty OS
+
+license_notice: >
+  License information should be defined at the repository level.
+
+changelog_notice: >
+  See CHANGELOG.md for version history.
