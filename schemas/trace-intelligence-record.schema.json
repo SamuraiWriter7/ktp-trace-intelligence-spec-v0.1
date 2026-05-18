@@ -1,0 +1,472 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kazene.example/specs/trace-intelligence-record.schema.json",
+  "title": "KTP Trace Intelligence Record",
+  "description": "A JSON Schema for validating Trace Intelligence Records within the Kazene Trace Protocol.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "trace_id",
+    "record_version",
+    "created_at",
+    "observer",
+    "target",
+    "origin_candidates",
+    "evidence",
+    "review_status",
+    "allocation_readiness"
+  ],
+  "properties": {
+    "trace_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A unique identifier for this trace intelligence record.",
+      "examples": [
+        "ktp-trace-2026-0001"
+      ]
+    },
+    "record_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version of the Trace Intelligence Record format.",
+      "examples": [
+        "0.1.0"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the trace record was created.",
+      "examples": [
+        "2026-05-18T10:00:00Z"
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the trace record was last updated."
+    },
+    "observer": {
+      "$ref": "#/$defs/observer"
+    },
+    "target": {
+      "$ref": "#/$defs/target"
+    },
+    "origin_candidates": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Possible origin candidates related to the target. These are not final origins.",
+      "items": {
+        "$ref": "#/$defs/origin_candidate"
+      }
+    },
+    "evidence": {
+      "$ref": "#/$defs/evidence"
+    },
+    "analysis": {
+      "$ref": "#/$defs/analysis"
+    },
+    "review_status": {
+      "$ref": "#/$defs/review_status"
+    },
+    "dispute_status": {
+      "$ref": "#/$defs/dispute_status"
+    },
+    "allocation_readiness": {
+      "$ref": "#/$defs/allocation_readiness"
+    },
+    "governance": {
+      "$ref": "#/$defs/governance"
+    }
+  },
+  "$defs": {
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "A confidence score between 0.0 and 1.0."
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "content_hash": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A content hash, such as sha256:examplehash.",
+      "examples": [
+        "sha256:examplehash"
+      ]
+    },
+    "observer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "human",
+            "ai_agent",
+            "platform",
+            "institution",
+            "hybrid"
+          ],
+          "description": "Type of observer that created or submitted the trace record."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name or identifier of the observer."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "Optional URI, DID, account ID, agent ID, or institutional identifier."
+        },
+        "confidence_policy": {
+          "type": "string",
+          "description": "Optional statement describing how the observer estimates confidence."
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "article",
+            "prompt",
+            "concept",
+            "structure",
+            "model_output",
+            "image",
+            "audio",
+            "video",
+            "code",
+            "dataset",
+            "other"
+          ],
+          "description": "Type of target being examined."
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable title of the target."
+        },
+        "uri": {
+          "$ref": "#/$defs/uri"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/content_hash"
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the target was observed or captured."
+        },
+        "language": {
+          "type": "string",
+          "description": "Language of the target content, if applicable.",
+          "examples": [
+            "en",
+            "ja"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Short summary of the target."
+        }
+      }
+    },
+    "origin_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin_id",
+        "relation_type",
+        "confidence",
+        "evidence_summary"
+      ],
+      "properties": {
+        "origin_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifier for the possible origin candidate."
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable title of the origin candidate."
+        },
+        "uri": {
+          "$ref": "#/$defs/uri"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/content_hash"
+        },
+        "relation_type": {
+          "type": "string",
+          "enum": [
+            "direct_reference",
+            "explicit_citation",
+            "structural_similarity",
+            "conceptual_influence",
+            "semantic_similarity",
+            "implicit_absorption",
+            "derivative_adaptation",
+            "paraphrase",
+            "translation",
+            "blended_influence",
+            "unknown"
+          ],
+          "description": "Type of inferred relationship between the target and origin candidate."
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        },
+        "evidence_summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short explanation of the supporting evidence."
+        },
+        "limitations": {
+          "type": "string",
+          "description": "Known limitations, uncertainties, or reasons this candidate may be incorrect."
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semantic_similarity_score": {
+          "$ref": "#/$defs/confidence"
+        },
+        "structure_similarity_score": {
+          "$ref": "#/$defs/confidence"
+        },
+        "conceptual_similarity_score": {
+          "$ref": "#/$defs/confidence"
+        },
+        "citation_presence": {
+          "type": "boolean",
+          "description": "Whether explicit citation or reference is present."
+        },
+        "metadata_presence": {
+          "type": "boolean",
+          "description": "Whether provenance metadata is present."
+        },
+        "watermark_presence": {
+          "type": "boolean",
+          "description": "Whether watermark evidence is present."
+        },
+        "chain_of_custody_presence": {
+          "type": "boolean",
+          "description": "Whether chain-of-custody evidence is present."
+        },
+        "structure_fingerprint_presence": {
+          "type": "boolean",
+          "description": "Whether a structure fingerprint record is available."
+        },
+        "origin_token_presence": {
+          "type": "boolean",
+          "description": "Whether an explicit Origin Token is available."
+        },
+        "evidence_items": {
+          "type": "array",
+          "description": "Optional list of individual evidence items.",
+          "items": {
+            "$ref": "#/$defs/evidence_item"
+          }
+        }
+      }
+    },
+    "evidence_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "evidence_type",
+        "description"
+      ],
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_type": {
+          "type": "string",
+          "enum": [
+            "citation",
+            "metadata",
+            "watermark",
+            "content_hash",
+            "structure_fingerprint",
+            "semantic_match",
+            "chain_of_custody",
+            "human_observation",
+            "ai_analysis",
+            "platform_log",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "$ref": "#/$defs/uri"
+        },
+        "confidence": {
+          "$ref": "#/$defs/confidence"
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "manual_review",
+            "embedding_similarity",
+            "structure_fingerprint_comparison",
+            "llm_assisted_analysis",
+            "provenance_analysis",
+            "hybrid_analysis",
+            "other"
+          ],
+          "description": "Method used to produce or support the trace analysis."
+        },
+        "summary": {
+          "type": "string"
+        },
+        "reasoning_notes": {
+          "type": "string"
+        },
+        "uncertainty_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "review_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "under_review",
+            "reviewed",
+            "disputed",
+            "rejected",
+            "revised",
+            "accepted_as_candidate"
+          ],
+          "description": "Current review state of the trace intelligence record."
+        },
+        "reviewer": {
+          "type": "string",
+          "description": "Human, institution, AI agent, or multi-wing process that reviewed the record."
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "dispute_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "disputed"
+      ],
+      "properties": {
+        "disputed": {
+          "type": "boolean"
+        },
+        "dispute_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "none",
+            "opened",
+            "under_review",
+            "resolved",
+            "dismissed",
+            "escalated"
+          ]
+        }
+      }
+    },
+    "allocation_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ready",
+        "reason"
+      ],
+      "properties": {
+        "ready": {
+          "type": "boolean",
+          "description": "Whether this record is ready for allocation review. This must not mean automatic allocation."
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Explanation for the readiness state."
+        },
+        "required_next_step": {
+          "type": "string",
+          "enum": [
+            "human_review",
+            "multi_wing_review",
+            "dispute_resolution",
+            "additional_evidence",
+            "allocation_readiness_review",
+            "no_action"
+          ],
+          "description": "Recommended next step before allocation can be considered."
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy_reference": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string"
+        },
+        "review_body": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
