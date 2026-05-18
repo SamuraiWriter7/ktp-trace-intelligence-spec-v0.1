@@ -1,0 +1,170 @@
+name: Validate Specs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate-specs:
+    name: Validate KTP Trace Intelligence Spec
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema PyYAML
+
+      - name: Validate specification files
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          import yaml
+          from jsonschema import Draft202012Validator, FormatChecker
+
+          root = Path(".")
+
+          required_files = [
+              "README.md",
+              "spec/trace-intelligence-record-v0.1.yaml",
+              "schemas/trace-intelligence-record.schema.json",
+              "examples/trace-intelligence-record.sample.json",
+              "examples/trace-intelligence-record.minimal.json",
+              "docs/design-principles.md",
+              "docs/relationship-to-kazene-trace-protocol.md",
+              "CHANGELOG.md",
+          ]
+
+          print("=== Checking required files ===")
+          missing = []
+          for file_path in required_files:
+              path = root / file_path
+              if not path.exists():
+                  missing.append(file_path)
+              else:
+                  print(f"OK: {file_path}")
+
+          if missing:
+              print("\nERROR: Missing required files:")
+              for file_path in missing:
+                  print(f"- {file_path}")
+              sys.exit(1)
+
+          print("\n=== Validating YAML spec ===")
+          spec_path = root / "spec/trace-intelligence-record-v0.1.yaml"
+          with spec_path.open("r", encoding="utf-8") as f:
+              spec = yaml.safe_load(f)
+
+          required_spec_keys = [
+              "id",
+              "version",
+              "title",
+              "status",
+              "description",
+              "core_principle",
+              "purpose",
+              "non_goals",
+              "design_principles",
+              "record_fields",
+              "validation_rules",
+              "safety_notes",
+          ]
+
+          for key in required_spec_keys:
+              if key not in spec:
+                  print(f"ERROR: Missing required spec key: {key}")
+                  sys.exit(1)
+              print(f"OK: spec contains '{key}'")
+
+          if spec.get("status") != "draft":
+              print("ERROR: spec.status must be 'draft' for v0.1.0")
+              sys.exit(1)
+
+          if spec.get("version") != "0.1.0":
+              print("ERROR: spec.version must be '0.1.0'")
+              sys.exit(1)
+
+          print("\n=== Loading JSON Schema ===")
+          schema_path = root / "schemas/trace-intelligence-record.schema.json"
+          with schema_path.open("r", encoding="utf-8") as f:
+              schema = json.load(f)
+
+          Draft202012Validator.check_schema(schema)
+          validator = Draft202012Validator(schema, format_checker=FormatChecker())
+          print("OK: JSON Schema is valid Draft 2020-12")
+
+          example_paths = [
+              root / "examples/trace-intelligence-record.sample.json",
+              root / "examples/trace-intelligence-record.minimal.json",
+          ]
+
+          print("\n=== Validating example records ===")
+          for example_path in example_paths:
+              with example_path.open("r", encoding="utf-8") as f:
+                  example = json.load(f)
+
+              errors = sorted(
+                  validator.iter_errors(example),
+                  key=lambda e: list(e.path)
+              )
+
+              if errors:
+                  print(f"\nERROR: Validation failed for {example_path}")
+                  for error in errors:
+                      path = ".".join(str(p) for p in error.path)
+                      location = path if path else "<root>"
+                      print(f"- {location}: {error.message}")
+                  sys.exit(1)
+
+              print(f"OK: {example_path}")
+
+          print("\n=== Running semantic safety checks ===")
+          for example_path in example_paths:
+              with example_path.open("r", encoding="utf-8") as f:
+                  example = json.load(f)
+
+              allocation = example.get("allocation_readiness", {})
+              review = example.get("review_status", {})
+              candidates = example.get("origin_candidates", [])
+
+              if allocation.get("ready") is True:
+                  state = review.get("state")
+                  if state not in ["reviewed", "accepted_as_candidate"]:
+                      print(
+                          f"ERROR: {example_path} has allocation_readiness.ready=true "
+                          f"without reviewed or accepted_as_candidate status."
+                      )
+                      sys.exit(1)
+
+              for candidate in candidates:
+                  confidence = candidate.get("confidence")
+                  if confidence is not None and confidence >= 0.95:
+                      print(
+                          f"WARNING: {example_path} contains a very high confidence score. "
+                          "Ensure this is still treated as candidate evidence, not final origin judgment."
+                      )
+
+              if not candidates:
+                  print(f"ERROR: {example_path} must contain at least one origin candidate.")
+                  sys.exit(1)
+
+              print(f"OK: semantic checks passed for {example_path}")
+
+          print("\nAll KTP Trace Intelligence spec validations passed.")
+          PY
