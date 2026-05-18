@@ -1,0 +1,42 @@
+{
+  "trace_id": "ktp-trace-2026-0001",
+  "record_version": "0.1.0",
+  "created_at": "2026-05-18T10:00:00Z",
+  "observer": {
+    "type": "ai_agent",
+    "name": "Shingen-Tracking-Maru"
+  },
+  "target": {
+    "type": "article",
+    "title": "The Future of Trace Intelligence",
+    "uri": "https://example.com/article",
+    "content_hash": "sha256:target-example-hash"
+  },
+  "origin_candidates": [
+    {
+      "origin_id": "kazene-origin-001",
+      "title": "Kazene Trace Protocol",
+      "uri": "https://example.com/origin",
+      "relation_type": "structural_similarity",
+      "confidence": 0.78,
+      "evidence_summary": "The target shares a similar layered structure involving origin, trace, review, and allocation."
+    }
+  ],
+  "evidence": {
+    "semantic_similarity_score": 0.72,
+    "structure_similarity_score": 0.81,
+    "citation_presence": false,
+    "metadata_presence": false,
+    "watermark_presence": false,
+    "chain_of_custody_presence": false
+  },
+  "review_status": {
+    "state": "pending",
+    "notes": "Requires human or multi-wing review."
+  },
+  "allocation_readiness": {
+    "ready": false,
+    "reason": "Trace record is evidence only. Allocation requires separate review.",
+    "required_next_step": "multi_wing_review"
+  }
+}
