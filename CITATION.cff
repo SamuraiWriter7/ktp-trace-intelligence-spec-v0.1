@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this specification, please cite it as below."
+title: "KTP Trace Intelligence Specification v0.1"
+version: "0.1.0"
+date-released: "2026-05-18"
+
+authors:
+  - name: "SamuraiWriter7"
+
+repository-code: "https://github.com/SamuraiWriter7/ktp-trace-intelligence-spec-v0.1"
+url: "https://github.com/SamuraiWriter7/ktp-trace-intelligence-spec-v0.1"
+
+abstract: >
+  KTP Trace Intelligence Specification v0.1 defines a minimal
+  evidence-packet format for recording origin candidates, structural
+  influence, conceptual lineage, and trace intelligence claims within
+  the Kazene Trace Protocol. It separates evidence from judgment and
+  prevents premature allocation or enforcement based only on trace signals.
+
+keywords:
+  - Kazene
+  - Kazene Trace Protocol
+  - trace intelligence
+  - origin candidate
+  - structure fingerprint
+  - conceptual lineage
+  - provenance
+  - AI governance
+  - Royalty OS
+
+license: MIT
